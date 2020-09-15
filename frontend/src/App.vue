@@ -1,29 +1,15 @@
 <template>
-  <div :style="initial" jid="app">
-    <FileParser />
-  </div>
+  <v-main>
+    <router-view />
+  </v-main>
 </template>
 
 <script>
-import FileParser from "./components/FileParser.vue";
-import "./assets/css/main.css";
-
 export default {
-  name: "app",
-  data() {
-    return {
-      initial: {
-        backgroundColor: "black"
-      }
-    };
-  },
-  components: {
-    FileParser
-  }
+  name: "App",
+
+  data: () => ({
+    //
+  })
 };
 </script>
-<style scoped>
-body {
-  background-color: red;
-}
-</style>

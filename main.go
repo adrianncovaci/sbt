@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"sbt/database"
 	"sbt/models"
 
+	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/leaanthony/mewn"
 	"github.com/wailsapp/wails"
@@ -37,19 +39,42 @@ func basic(filename string) {
 	}
 }
 
+func getAllPolicies() *gorm.DB {
+	result := db.Find(&[]models.CustomItem{})
+	return result
+}
+
+func exportPolicies(content string, fileName string) {
+	fileName = fmt.Sprintf("%s.json", fileName)
+	f, err := os.Create(fileName)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	l, err := f.WriteString(content)
+	if err != nil {
+		fmt.Println(err)
+		f.Close()
+		return
+	}
+	fmt.Println(l, "bytes written successfully")
+}
+
 func main() {
 
 	js := mewn.String("./frontend/dist/app.js")
 	css := mewn.String("./frontend/dist/app.css")
 
 	app := wails.CreateApp(&wails.AppConfig{
-		Width:  995,
-		Height: 438,
+		Width:  1280,
+		Height: 530,
 		Title:  "sbt",
 		JS:     js,
 		CSS:    css,
 		Colour: "#131313",
 	})
 	app.Bind(basic)
+	app.Bind(getAllPolicies)
+	app.Bind(exportPolicies)
 	app.Run()
 }
