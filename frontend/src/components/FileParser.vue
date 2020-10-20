@@ -2,6 +2,7 @@
   <div class="container">
     <b-card style="border:none" bg-variant="white" text-variant="dark">
       <b-button to="/export" router-tag="li">Export Policies</b-button>
+      <b-button to="/manage" router-tag="li">Manage Policies</b-button>
       <hr class="my-4" />
       <b-card-text>Filename:</b-card-text>
       <b-form-input v-model="fileName" placeholder="Enter filename"></b-form-input>

@@ -5,6 +5,7 @@ Vue.use(Router);
 
 import PolicyExport from './components/PolicyExport.vue';
 import FileParser from './components/FileParser.vue';
+import PolicyManager from './components/PolicyManager.vue';
 
 export default new Router({
     routes: [{
@@ -16,6 +17,11 @@ export default new Router({
         path: "",
         name: "file-parser",
         component: FileParser
+    },
+    {
+        path: "/manage",
+        name: "policy-manager",
+        component: PolicyManager
     }
     ]
 });

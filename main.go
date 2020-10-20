@@ -7,12 +7,24 @@ import (
 	"os"
 	"sbt/database"
 	"sbt/models"
+	"strings"
+
+	"os/exec"
+
+	"strconv"
+
+	"regexp"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/leaanthony/mewn"
 	"github.com/wailsapp/wails"
 )
+
+type checkAudit struct {
+	State  bool
+	Output string
+}
 
 var customItems []models.CustomItem
 var db = database.InitDB()
@@ -60,6 +72,29 @@ func exportPolicies(content string, fileName string) {
 	fmt.Println(l, "bytes written successfully")
 }
 
+func execAuditCheck(id string) checkAudit {
+	policyId, _ := strconv.Atoi(id)
+	var policy models.CustomItem
+	db.First(&policy, policyId)
+	raw_command := strings.Trim(policy.Cmd, " ")
+	raw_command = strings.Replace(raw_command, "\\", "", -1)
+	shell_file, _ := os.Create("scr.sh")
+	shell_file.WriteString(raw_command)
+	out, _ := exec.Command("/bin/sh", "scr.sh").Output()
+	output := string(out[:])
+	output = strings.TrimSuffix(output, "\n")
+	regex := strings.Trim(policy.Expect, " ")
+	fmt.Println("ASD" + regex + "ASD")
+	fmt.Println("ASD" + output + "ASD")
+	result, _ := regexp.MatchString(regex, output)
+	fmt.Println(result)
+	res := checkAudit{
+		State:  result,
+		Output: output,
+	}
+	return res
+}
+
 func main() {
 
 	js := mewn.String("./frontend/dist/app.js")
@@ -76,5 +111,6 @@ func main() {
 	app.Bind(basic)
 	app.Bind(getAllPolicies)
 	app.Bind(exportPolicies)
+	app.Bind(execAuditCheck)
 	app.Run()
 }
